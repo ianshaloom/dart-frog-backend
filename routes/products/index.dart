@@ -1,11 +1,7 @@
 import 'dart:io';
 
 import 'package:dart_frog/dart_frog.dart';
-import 'package:dart_frog_backend/data/firebase_datasource.dart';
-import 'package:dart_frog_backend/models/product/product.dart';
 import 'package:dart_frog_backend/repo.dart';
-import 'package:firedart/firestore/firestore.dart';
-import 'package:uuid/uuid.dart';
 
 Future<Response> onRequest(RequestContext context) {
   switch (context.request.method) {
@@ -24,13 +20,17 @@ Future<Response> onRequest(RequestContext context) {
 
 Future<Response> _getAll(RequestContext context) async {
   final repo = context.read<DatasourceRepo>();
+  final listOfValues = <Map<String, dynamic>>[];
 
   try {
     final products = await repo.allProducts();
-    for (final element in products) {
-      print(element.name);
+
+    for (final product in products) {
+      final productMap = product.toJson();
+      listOfValues.add(productMap);
     }
-    return Response();
+
+    return Response.json(body: listOfValues);
   } on Exception catch (_) {
     return Response(statusCode: HttpStatus.internalServerError);
   }
@@ -38,24 +38,12 @@ Future<Response> _getAll(RequestContext context) async {
 
 Future<Response> _postItem(RequestContext context) async {
   final repo = context.read<DatasourceRepo>();
+  final body = await context.request.json() as Map<String, dynamic>;
 
   try {
-    final id = await repo.addProduct(product);
+    final id = await repo.addProduct(body);
     return Response(body: id);
   } on Exception catch (_) {
     return Response(statusCode: HttpStatus.internalServerError);
   }
 }
-
-Product product = Product(
-  id: Uuid().v4(),
-  name: 'Iphone 13 ProMax',
-  price: 250000,
-  description: 'Silver Blue',
-  unitOfMeasurement: 'Piece',
-  imageUrl: 'https://picsum.photos/250?image=9',
-  categoryId: '5601ea90-17c7-4522-82f1-fc2389906a39',
-);
-
-// final DatasourceRepo repo =
-//     DatasourceRepo(FirebaseDatasource(Firestore.instance));

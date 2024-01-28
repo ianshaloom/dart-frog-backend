@@ -21,8 +21,8 @@ class DatasourceRepo {
   }
 
   /// Adds the given [Product] to the repository.
-  Future<String> addProduct(Product product) async {
-    final id = await databaseRepo.addProduct(product.toJson());
+  Future<String> addProduct(Map<String, dynamic> json) async {
+    final id = await databaseRepo.addProduct(json);
     return id;
   }
 

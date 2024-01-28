@@ -30,9 +30,9 @@ class FirebaseDatasource extends DatabaseRepo {
 
   @override
   Future<String> addProduct(Map<String, dynamic> data) async {
-
     try {
       final id = data['id'] as String? ?? const Uuid().v4();
+      data['id'] = id;
 
       final doc = await firestore
           .collection(productsCollection)
