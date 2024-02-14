@@ -21,37 +21,38 @@ FutureOr<Response> onRequest(RequestContext context) async{
 }
 
 Future<Response> _getAll(RequestContext context) async {
-  final repo = context.read<DatasourceRepo>().categoryRepo;
+  final repo = context.read<DatasourceRepo>().productRepo;
 
   try {
     final products = await repo.allItems();
+
     return Response.json(body: products);
-  } on Exception catch (_) {
-    return Response(statusCode: HttpStatus.internalServerError);
+  } on Exception catch (e) {
+    return Response(statusCode: HttpStatus.internalServerError, body: e.toString());
   }
 }
 
 Future<Response> _postItem(RequestContext context) async {
-  final repo = context.read<DatasourceRepo>().categoryRepo;
+  final repo = await context.read<DatasourceRepo>().productRepo;
   final body = await context.request.json() as Map<String, dynamic>;
 
   try {
     final id = await repo.addItem(body);
     return Response(body: id);
-  } on Exception catch (_) {
-    return Response(statusCode: HttpStatus.internalServerError);
+  } on Exception catch (e) {
+    return Response(statusCode: HttpStatus.internalServerError, body: e.toString());
   }
 }
 
 Future<Response> _deleteAll(RequestContext context) async {
-  final repo = await context.read<DatasourceRepo>().categoryRepo;
+  final repo = await context.read<DatasourceRepo>().productRepo;
 
   try {
     await repo.deleteAllItems();
 
     return Response(
         body: 'All products deleted', statusCode: HttpStatus.noContent);
-  } on Exception catch (_) {
-    return Response(statusCode: HttpStatus.internalServerError);
+  } on Exception catch (e) {
+    return Response(statusCode: HttpStatus.internalServerError, body: e.toString());
   }
 }

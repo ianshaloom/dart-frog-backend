@@ -1,16 +1,18 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:dart_frog/dart_frog.dart';
-import 'package:dart_frog_backend/repo.dart';
+import 'package:dart_frog_backend/repository/repos_impl.dart';
 
-Future<Response> onRequest(RequestContext context) {
+FutureOr<Response> onRequest(RequestContext context) async {
   switch (context.request.method) {
     case HttpMethod.get:
       return _getAll(context);
     case HttpMethod.post:
       return _postItem(context);
-    case HttpMethod.put:
     case HttpMethod.delete:
+      return _deleteAll(context);
+    case HttpMethod.put:
     case HttpMethod.patch:
     case HttpMethod.head:
     case HttpMethod.options:
@@ -19,30 +21,37 @@ Future<Response> onRequest(RequestContext context) {
 }
 
 Future<Response> _getAll(RequestContext context) async {
-  final repo = context.read<DatasourceRepo>();
-  final listOfValues = <Map<String, dynamic>>[];
+  final repo = await context.read<DatasourceRepo>().usersRepo;
 
   try {
-    final products = await repo.allProducts();
+    final products = await repo.allItems();
 
-    for (final product in products) {
-      final productMap = product.toJson();
-      listOfValues.add(productMap);
-    }
-
-    return Response.json(body: listOfValues);
+    return Response.json(body: products);
   } on Exception catch (_) {
     return Response(statusCode: HttpStatus.internalServerError);
   }
 }
 
 Future<Response> _postItem(RequestContext context) async {
-  final repo = context.read<DatasourceRepo>();
+  final repo = await context.read<DatasourceRepo>().usersRepo;
   final body = await context.request.json() as Map<String, dynamic>;
 
   try {
-    final id = await repo.addProduct(body);
+    final id = await repo.addItem(body);
     return Response(body: id);
+  } on Exception catch (_) {
+    return Response(statusCode: HttpStatus.internalServerError);
+  }
+}
+
+Future<Response> _deleteAll(RequestContext context) async {
+  final repo = await context.read<DatasourceRepo>().usersRepo;
+
+  try {
+    await repo.deleteAllItems();
+
+    return Response(
+        body: 'All products deleted', statusCode: HttpStatus.noContent);
   } on Exception catch (_) {
     return Response(statusCode: HttpStatus.internalServerError);
   }

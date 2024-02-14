@@ -2,13 +2,13 @@ import 'dart:io';
 
 import 'package:dart_frog/dart_frog.dart';
 import 'package:dart_frog_backend/data/firebase_datasource.dart';
-import 'package:dart_frog_backend/repo.dart';
+import 'package:dart_frog_backend/repository/repos_impl.dart';
 import 'package:firedart/firestore/firestore.dart';
 
 Handler middleware(Handler handler) {
   final h = handler.use(requestLogger()).use(
     provider<DatasourceRepo>((_) {
-      return DatasourceRepo(FirebaseDatasource(Firestore.instance));
+      return DatasourceRepo(FireStoreImpl(Firestore.instance));
     }),
   ).use(
     firebaseMiddleware,
@@ -21,7 +21,7 @@ Handler firebaseMiddleware(Handler handler) {
   return (RequestContext context) async {
     try {
       if (!Firestore.initialized) {
-        Firestore.initialize('digi-duka');
+        Firestore.initialize(value!);
       }
 
       final response = await handler(context);
@@ -31,3 +31,5 @@ Handler firebaseMiddleware(Handler handler) {
     }
   };
 }
+
+String? value = Platform.environment['FIREBASE_PROJECT_ID'];
