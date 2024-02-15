@@ -2,9 +2,10 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:dart_frog/dart_frog.dart';
+import 'package:dart_frog_backend/cache/cache.dart';
 import 'package:dart_frog_backend/repository/repos_impl.dart';
 
-FutureOr<Response> onRequest(RequestContext context) async{
+FutureOr<Response> onRequest(RequestContext context) async {
   switch (context.request.method) {
     case HttpMethod.get:
       return _getAll(context);
@@ -22,13 +23,21 @@ FutureOr<Response> onRequest(RequestContext context) async{
 
 Future<Response> _getAll(RequestContext context) async {
   final repo = context.read<DatasourceRepo>().productRepo;
+  final command = context.read<CachingDependency>();
 
   try {
-    final products = await repo.allItems();
+    final cache = await command.get("products");
 
+    if (cache != null) {
+      return Response.json(body: cache);
+    }
+
+    final products = await repo.allItems();
+    command.set("products", products, 60);
     return Response.json(body: products);
   } on Exception catch (e) {
-    return Response(statusCode: HttpStatus.internalServerError, body: e.toString());
+    return Response(
+        statusCode: HttpStatus.internalServerError, body: e.toString());
   }
 }
 
@@ -38,9 +47,11 @@ Future<Response> _postItem(RequestContext context) async {
 
   try {
     final id = await repo.addItem(body);
-    return Response(body: id);
+
+    return Response(body: 'Product added with ID:$id', statusCode: HttpStatus.created);
   } on Exception catch (e) {
-    return Response(statusCode: HttpStatus.internalServerError, body: e.toString());
+    return Response(
+        statusCode: HttpStatus.internalServerError, body: e.toString());
   }
 }
 
@@ -53,6 +64,7 @@ Future<Response> _deleteAll(RequestContext context) async {
     return Response(
         body: 'All products deleted', statusCode: HttpStatus.noContent);
   } on Exception catch (e) {
-    return Response(statusCode: HttpStatus.internalServerError, body: e.toString());
+    return Response(
+        statusCode: HttpStatus.internalServerError, body: e.toString());
   }
 }

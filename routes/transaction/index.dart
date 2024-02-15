@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:dart_frog/dart_frog.dart';
+import 'package:dart_frog_backend/cache/cache.dart';
 import 'package:dart_frog_backend/repository/repos_impl.dart';
 
 FutureOr<Response> onRequest(RequestContext context) async {
@@ -23,9 +24,17 @@ FutureOr<Response> onRequest(RequestContext context) async {
 Future<Response> _getAll(RequestContext context) async {
   final repo = await context.read<DatasourceRepo>().transactionRepo;
   final collection = await context.request.headers['collection']!;
+   final cacheDep = context.read<CachingDependency>();
 
   try {
+    final cache = await cacheDep.get(collection);
+
+    if (cache != null) {
+      return Response.json(body: cache);
+    }
+
     final transactions = await repo.allTransaction(collection);
+    cacheDep.set(collection, transactions, 60);
 
     return Response.json(body: transactions);
   } on Exception catch (_) {

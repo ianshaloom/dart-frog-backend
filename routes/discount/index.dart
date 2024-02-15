@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:dart_frog/dart_frog.dart';
+import 'package:dart_frog_backend/cache/cache.dart';
+import 'package:dart_frog_backend/constants/constants.dart';
 import 'package:dart_frog_backend/repository/repos_impl.dart';
 
 FutureOr<Response> onRequest(RequestContext context) async {
@@ -22,10 +24,18 @@ FutureOr<Response> onRequest(RequestContext context) async {
 
 FutureOr<Response> _getDiscount(RequestContext context) async {
   final repo = await context.read<DatasourceRepo>().discountRepo;
+   final cacheDep = context.read<CachingDependency>();
 
   try {
-    final discounts = await repo.allItems();
+    final cache = await cacheDep.get(discountsCollection);
 
+    if (cache != null) {
+      return Response.json(body: cache);
+    }
+
+    final discounts = await repo.allItems();
+    cacheDep.set(discountsCollection, discounts, 60);
+    
     return Response.json(body: discounts);
   } on Exception catch (e) {
     return Response(

@@ -12,7 +12,6 @@ dependencies:
   firedart: ^0.9.7
   json_annotation: ^4.8.1
   json_serializable: ^6.7.1
-  meta:
   uuid: ^4.3.3
 
 dev_dependencies:
