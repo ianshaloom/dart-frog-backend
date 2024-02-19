@@ -1,3 +1,7 @@
+import 'dart:convert';
+
+import 'package:crypto/crypto.dart';
+
 /// A  collection of products.
 const String productsCollection = 'products';
 /// A collection of categories.
@@ -19,3 +23,11 @@ const String purchasesCollection = 'purchases';
 
 /// A collection of expenses.
 const String expensesCollection = 'expenses';
+
+extension StringExtension on String {
+  String hashWithSHA256() {
+    var bytes = utf8.encode(this);
+    var digest = sha256.convert(bytes);
+    return digest.toString();
+  }
+}
