@@ -50,16 +50,9 @@ class UserRepository {
 
     final user = users.values.where(
       (user) {
-        final emailCheck = user.username == username ? 'true' : 'false';
-        final passwordCheck =
-            user.password == hashedPassword ? 'true' : 'false';
-        print('pass: ${passwordCheck} email: ${emailCheck}');
-
         return user.username == username && user.password == hashedPassword;
       },
     ).toList();
-
-    print('user: ${user.isEmpty}');
 
     return user.isEmpty ? null : user.first;
   }

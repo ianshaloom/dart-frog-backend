@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:dart_frog_backend/data/firebase_datasource.dart';
 import 'package:dart_frog_backend/repository/repos_impl.dart';
+import 'package:dart_frog_backend/repository/session/session.dart';
+import 'package:dart_frog_backend/repository/user/user.dart';
 import 'package:firedart/firestore/firestore.dart';
 import 'package:dart_frog_backend/cache/cache.dart';
 
@@ -15,6 +17,8 @@ Handler middleware(Handler handler) {
         }),
       )
       .use(firebaseMiddleware)
+      .use(provider<UserRepository>((_) => _userRepo))
+      .use(provider<SessionRepository>((_) => _sessionRepo))
       .use(internalCacheMiddleware);
 
   return h;
@@ -57,4 +61,5 @@ Handler internalCacheMiddleware(Handler handler) {
   };
 }
 
-// curl --request GET 'http://localhost:8080' --header 'Content-Type: application/json' --data-raw '{"name":"John"}'
+final _userRepo = UserRepository();
+final _sessionRepo = SessionRepository();
