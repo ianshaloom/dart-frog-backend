@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 
-Map<String, Session> sessions = {};
+
 
 class Session extends Equatable {
   final String userId;
@@ -48,4 +48,11 @@ class SessionRepository {
   String generateToken(String userId) {
     return '${userId}--${DateTime.now().toIso8601String()}';
   }
+
+  final Map<String, Session> sessions = {};
+
+  // factory constructor
+  SessionRepository._();
+  static final SessionRepository _instance = SessionRepository._();
+  factory SessionRepository() => _instance;
 }

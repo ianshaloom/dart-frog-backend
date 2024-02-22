@@ -18,8 +18,8 @@ Handler middleware(Handler handler) {
       )
       .use(firebaseMiddleware)
       .use(provider<UserRepository>((_) => _userRepo))
-      .use(provider<SessionRepository>((_) => _sessionRepo))
-      .use(internalCacheMiddleware);
+      .use(internalCacheMiddleware)
+      .use(sessionMiddleware);
 
   return h;
 }
@@ -61,5 +61,25 @@ Handler internalCacheMiddleware(Handler handler) {
   };
 }
 
+Handler sessionMiddleware(Handler handler) {
+  return (RequestContext context) async {
+    Response response;
+
+    try {
+      final sessionRepo = SessionRepository();
+
+      response = await handler
+          .use(provider<SessionRepository>((_) => sessionRepo))
+          .call(context);
+    } catch (e) {
+      response = Response(
+        statusCode: HttpStatus.internalServerError,
+        body: 'outer try ${e.toString()}',
+      );
+    }
+
+    return response;
+  };
+}
+
 final _userRepo = UserRepository();
-final _sessionRepo = SessionRepository();
