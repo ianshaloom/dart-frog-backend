@@ -11,13 +11,13 @@ import 'package:dart_frog_backend/cache/cache.dart';
 Handler middleware(Handler handler) {
   final h = handler
       .use(requestLogger())
+      .use(userMiddleware)
       .use(
         provider<DatasourceRepo>((_) {
           return DatasourceRepo(FireStoreImpl(Firestore.instance));
         }),
       )
       .use(firebaseMiddleware)
-      .use(userMiddleware)
       .use(internalCacheMiddleware)
       .use(sessionMiddleware);
 
@@ -85,9 +85,10 @@ Handler sessionMiddleware(Handler handler) {
 Handler userMiddleware(Handler handler) {
   return (RequestContext context) async {
     Response response;
+    final datarepo = context.read<DatasourceRepo>();
 
     try {
-      final userRepo = UserRepository();
+      final userRepo = UserRepository(datarepo);
 
       response = await handler
           .use(provider<UserRepository>((_) => userRepo))

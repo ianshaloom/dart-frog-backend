@@ -132,6 +132,11 @@ class UsersRepoImpl extends ModelRepo {
   Future<void> deleteAllItems() async {
     await databaseRepo.deleteAllUsers();
   }
+
+  Future<bool> userExists(String id) async {
+    final exists = await databaseRepo.userExists(id);
+    return exists;
+  }
 }
 
 class DiscountRepoImpl extends ModelRepo {

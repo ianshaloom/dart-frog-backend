@@ -1,4 +1,5 @@
 import 'package:dart_frog_backend/constants/constants.dart';
+import 'package:dart_frog_backend/repository/repos_impl.dart';
 import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:uuid/uuid.dart';
@@ -41,46 +42,68 @@ class User extends Equatable {
   List<Object?> get props => [id, username, email, password];
 }
 
-
 class UserRepository {
+  final DatasourceRepo datasourceRepo;
 
   final Map<String, User> users = {};
 
   //check if user exists in the database
-  Future<User?> userFromCredentials(String username, String password) async {
+  Future<User?> userFromCredentials(String email, String password) async {
     final hashedPassword = password.hashWithSHA256();
 
-    final user = users.values.where(
-      (user) {
-        return user.username == username && user.password == hashedPassword;
-      },
-    ).toList();
+    try {
+      final userExist = await datasourceRepo.usersRepo.userExists(email.hashWithSHA256());
 
-    return user.isEmpty ? null : user.first;
+      if (!userExist) {
+        return null;
+      }
+
+      final user = await datasourceRepo.usersRepo.getItem(email.hashWithSHA256()).then((value) => User.fromJson(value));
+
+      final credentialsMatch = user.password == hashedPassword;
+
+      return credentialsMatch ? user : throw Exception('Incorrect credentials');
+      
+    } catch (e) {
+
+      throw Future.error(Exception(e.toString()));
+      
+    }
   }
 
   // search a user by id
   Future<User?> userFromId(String id) async {
-    final user = users[id];
 
-    return user;
+    try {
+      final user = await datasourceRepo.usersRepo.getItem(id).then((value) => User.fromJson(value));
+      return user;
+      
+    } catch (e) {
+      throw Future.error(Exception(e.toString()));
+      
+    }
   }
 
-  Future<User> createUser(
+  Future<String> createUser(
     String username,
     String email,
     String password,
   ) async {
     final user = User(
-      id: const Uuid().v5(null, email),
+      id: email.hashWithSHA256(),
       username: username,
       email: email,
       password: password.hashWithSHA256(),
     );
 
-    users[user.id] = user;
+    print(user.toJson());
 
-    return Future.value(user);
+    try {
+      final id = await datasourceRepo.usersRepo.addItem(user.toJson());
+      return Future.value(id);
+    } catch (e) {
+      throw Future.error(Exception(e.toString()));
+    }
   }
 
   Future<void> deleteUser(String id) async {
@@ -115,8 +138,5 @@ class UserRepository {
     return Future.value(updatedUser);
   }
 
-  // factory constructor
-  UserRepository._();
-  static final UserRepository _instance = UserRepository._();
-  factory UserRepository() =>  _instance;
+  UserRepository(this.datasourceRepo);
 }

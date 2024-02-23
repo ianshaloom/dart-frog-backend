@@ -23,6 +23,7 @@ abstract class DatabaseRepo {
   Future<void> updateUser(String id, Map<String, dynamic> data);
   Future<void> deleteUser(String id);
   Future<void> deleteAllUsers();
+  Future<bool> userExists(String id);
 
   /// Discount CRUD operations
   Future<Map<String, dynamic>> getDiscount(String id);

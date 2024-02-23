@@ -173,7 +173,8 @@ class FireStoreImpl extends DatabaseRepo {
   @override
   Future<Map<String, dynamic>> getUser(String id) async {
     try {
-      final doc = await firestore.collection(usersCollection).document(id).get();
+      final doc =
+          await firestore.collection(usersCollection).document(id).get();
       return doc.map;
     } on Exception catch (_) {
       return Future.error(Exception('Error fetching user'));
@@ -200,10 +201,16 @@ class FireStoreImpl extends DatabaseRepo {
   @override
   Future<String> addUser(Map<String, dynamic> data) async {
     try {
-      final id = const Uuid().v4();
-      data['id'] = id;
+      final id = data['id'] as String? ?? const Uuid().v4();
 
-      final doc = await firestore.collection(usersCollection).document(id).create(data);
+      final userExist = await userExists(id);
+
+      if (userExist) {
+        return 'User already exists';
+      }
+
+      final doc =
+          await firestore.collection(usersCollection).document(id).create(data);
       return doc.id;
     } on Exception catch (_) {
       return Future.error(Exception('Error adding user'));
@@ -238,6 +245,17 @@ class FireStoreImpl extends DatabaseRepo {
       });
     } on Exception catch (_) {
       return Future.error(Exception('Error deleting all users'));
+    }
+  }
+
+  @override
+  Future<bool> userExists(String id) async {
+    try {
+      final doc =
+          await firestore.collection(usersCollection).document(id).exists;
+      return doc;
+    } catch (e) {
+      return Future.error(e);
     }
   }
 
@@ -276,7 +294,10 @@ class FireStoreImpl extends DatabaseRepo {
       final id = const Uuid().v4();
       data['id'] = id;
 
-      final doc = await firestore.collection(discountsCollection).document(id).create(data);
+      final doc = await firestore
+          .collection(discountsCollection)
+          .document(id)
+          .create(data);
       return doc.id;
     } on Exception catch (_) {
       return Future.error(Exception('Error adding discount'));
@@ -350,7 +371,8 @@ class FireStoreImpl extends DatabaseRepo {
       final id = const Uuid().v4();
       data['id'] = id;
 
-      final doc = await firestore.collection(collection).document(id).create(data);
+      final doc =
+          await firestore.collection(collection).document(id).create(data);
       return doc.id;
     } on Exception catch (_) {
       return Future.error(Exception('Error adding transaction'));
@@ -393,7 +415,8 @@ class FireStoreImpl extends DatabaseRepo {
   @override
   Future<Map<String, dynamic>> getExpense(String id) async {
     try {
-      final doc = await firestore.collection(expensesCollection).document(id).get();
+      final doc =
+          await firestore.collection(expensesCollection).document(id).get();
       return doc.map;
     } on Exception catch (_) {
       return Future.error(Exception('Error fetching expense'));
@@ -423,7 +446,10 @@ class FireStoreImpl extends DatabaseRepo {
       final id = const Uuid().v4();
       data['id'] = id;
 
-      final doc = await firestore.collection(expensesCollection).document(id).create(data);
+      final doc = await firestore
+          .collection(expensesCollection)
+          .document(id)
+          .create(data);
       return doc.id;
     } on Exception catch (_) {
       return Future.error(Exception('Error adding expense'));
