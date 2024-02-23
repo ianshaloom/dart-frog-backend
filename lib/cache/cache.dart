@@ -46,7 +46,3 @@ class CachingDependency {
   static final CachingDependency _instance = CachingDependency._();
   factory CachingDependency() => _instance;
 }
-
-CachingDependency createCachingDependency() {
-  return CachingDependency();
-}

@@ -57,7 +57,7 @@ Future<Response> _authenticateUser(RequestContext context) async {
 
     return Response(body: session.token);
     
-  } on Exception catch (_) {
-    return Response(statusCode: HttpStatus.internalServerError);
+  }  catch (e) {
+    return Response(statusCode: HttpStatus.internalServerError, body: 'Error: $e');
   }
 }
