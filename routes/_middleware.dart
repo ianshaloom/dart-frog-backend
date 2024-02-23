@@ -17,7 +17,7 @@ Handler middleware(Handler handler) {
         }),
       )
       .use(firebaseMiddleware)
-      .use(provider<UserRepository>((_) => _userRepo))
+      .use(provider<UserRepository>((_) => UserRepository()))
       .use(internalCacheMiddleware)
       .use(sessionMiddleware);
 
@@ -82,4 +82,3 @@ Handler sessionMiddleware(Handler handler) {
   };
 }
 
-final _userRepo = UserRepository();

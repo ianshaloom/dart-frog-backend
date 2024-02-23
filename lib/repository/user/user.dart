@@ -41,9 +41,11 @@ class User extends Equatable {
   List<Object?> get props => [id, username, email, password];
 }
 
-Map<String, User> users = {};
 
 class UserRepository {
+
+  final Map<String, User> users = {};
+
   //check if user exists in the database
   Future<User?> userFromCredentials(String username, String password) async {
     final hashedPassword = password.hashWithSHA256();
@@ -112,4 +114,9 @@ class UserRepository {
 
     return Future.value(updatedUser);
   }
+
+  // factory constructor
+  UserRepository._();
+  static final UserRepository _instance = UserRepository._();
+  factory UserRepository() =>  _instance;
 }
