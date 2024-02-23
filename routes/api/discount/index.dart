@@ -37,7 +37,7 @@ FutureOr<Response> _getDiscount(RequestContext context) async {
     cacheDep.set(discountsCollection, discounts, 60);
     
     return Response.json(body: discounts);
-  } on Exception catch (e) {
+   } catch (e) {
     return Response(
         statusCode: HttpStatus.internalServerError, body: e.toString());
   }
@@ -50,7 +50,7 @@ Future<Response> _postDiscount(RequestContext context) async {
   try {
     final id = await repo.addItem(body);
     return Response(body: id);
-  } on Exception catch (e) {
+   } catch (e) {
     return Response(
         statusCode: HttpStatus.internalServerError, body: e.toString());
   }
@@ -63,7 +63,7 @@ Future<Response> _deleteAllDiscounts(RequestContext context) async {
     await repo.deleteAllItem();
 
     return Response(body: 'All Discounts deleted');
-  } on Exception catch (e) {
+  } catch (e) {
     return Response(
         statusCode: HttpStatus.internalServerError, body: e.toString());
   }

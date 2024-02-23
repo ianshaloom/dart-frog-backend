@@ -27,8 +27,9 @@ Future<Response> _getUser(RequestContext context, String userId) async {
     final user = await repo.getItem(userId);
 
     return Response.json(body: user);
-  } on Exception catch (_) {
-    return Response(statusCode: HttpStatus.internalServerError);
+  } catch (e) {
+    return Response(
+        statusCode: HttpStatus.internalServerError, body: e.toString());
   }
 }
 
@@ -39,8 +40,9 @@ Future<Response> _updateUser(RequestContext context, String userId) async {
   try {
     await repo.updateItem(userId, body);
     return Response(body: 'User details updated', statusCode: HttpStatus.noContent);
-  } on Exception catch (_) {
-    return Response(statusCode: HttpStatus.internalServerError);
+   } catch (e) {
+    return Response(
+        statusCode: HttpStatus.internalServerError, body: e.toString());
   }
 }
 
@@ -50,7 +52,8 @@ Future<Response> _deleteUser(RequestContext context, String userId) async {
   try {
     await repo.deleteItem(userId);
     return Response(body: 'User deleted', statusCode: HttpStatus.noContent);
-  } on Exception catch (_) {
-    return Response(statusCode: HttpStatus.internalServerError);
+  } catch (e) {
+    return Response(
+        statusCode: HttpStatus.internalServerError, body: e.toString());
   }
 }

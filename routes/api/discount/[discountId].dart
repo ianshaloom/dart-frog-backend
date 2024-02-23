@@ -42,7 +42,7 @@ Future<Response> _updateDiscount(
     await repo.updateItem(discountId, body);
 
     return Response(body: 'Discount updated');
-  } on Exception catch (e) {
+   } catch (e) {
     return Response(
         statusCode: HttpStatus.internalServerError, body: e.toString());
   }
@@ -56,7 +56,7 @@ Future<Response> _deleteDiscount(
     await repo.deleteItem(discountId);
 
     return Response(body: 'Discount deleted');
-  } on Exception catch (e) {
+   } catch (e) {
     return Response(
         statusCode: HttpStatus.internalServerError, body: e.toString());
   }

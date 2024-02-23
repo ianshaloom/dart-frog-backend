@@ -37,7 +37,7 @@ Future<Response> _getAllExpenses(RequestContext context) async{
     cacheDep.set(expensesCollection, expenses, 60);
 
     return Response.json(body: expenses);
-  } on Exception catch (e) {
+  } catch (e) {
     return Response(
         statusCode: HttpStatus.internalServerError, body: e.toString());
   }
@@ -51,7 +51,7 @@ Future<Response> _postExpense(RequestContext context) async{
     final id = await repo.addItem(body);
     return Response(body: id);
 
-  } on Exception catch (e) {
+  } catch (e) {
     return Response(
         statusCode: HttpStatus.internalServerError, body: e.toString());
   }
@@ -64,7 +64,7 @@ Future<Response> _deleteAllExpenses(RequestContext context) async{
     await repo.deleteAllItem();
 
     return Response(body: 'All Expenses deleted');
-  } on Exception catch (e) {
+   } catch (e) {
     return Response(
         statusCode: HttpStatus.internalServerError, body: e.toString());
   }

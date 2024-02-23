@@ -27,7 +27,7 @@ Future<Response> _getExpense(RequestContext context, String expenseId) async {
     final expense = await repo.getItem(expenseId);
 
     return Response.json(body: expense);
-  } on Exception catch (e) {
+  } catch (e) {
     return Response(
         statusCode: HttpStatus.internalServerError, body: e.toString());
   }
@@ -44,7 +44,7 @@ Future<Response> _updateExpense(
     await repo.updateItem(expenseId, body);
 
     return Response(body: 'Expense updated');
-  } on Exception catch (e) {
+  } catch (e) {
     return Response(
         statusCode: HttpStatus.internalServerError, body: e.toString());
   }
@@ -60,7 +60,7 @@ Future<Response> _deleteExpense(
     await repo.deleteItem(expenseId);
 
     return Response(body: 'Expense deleted');
-  } on Exception catch (e) {
+   } catch (e) {
     return Response(
         statusCode: HttpStatus.internalServerError, body: e.toString());
   }

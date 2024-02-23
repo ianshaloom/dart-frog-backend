@@ -32,8 +32,9 @@ Future<Response> _getCategory(
   try {
     final category = await repo.getItem(categoryId);
     return Response.json(body: category);
-  } on Exception catch (_) {
-    return Response(statusCode: HttpStatus.internalServerError);
+  } catch (e) {
+    return Response(
+        statusCode: HttpStatus.internalServerError, body: e.toString());
   }
 }
 
@@ -47,8 +48,8 @@ Future<Response> _updateCategory(
   try {
     await repo.updateItem(categoryId, body);
     return Response(body: 'Category updated');
-  } on Exception catch (_) {
-    return Response(statusCode: HttpStatus.internalServerError);
+  }  catch (e) {
+    return Response(statusCode: HttpStatus.internalServerError, body: e.toString());
   }
 }
 
@@ -61,7 +62,7 @@ Future<Response> _deleteCategory(
   try {
     await repo.deleteItem(categoryId);
     return Response(body: 'Category deleted');
-  } on Exception catch (_) {
-    return Response(statusCode: HttpStatus.internalServerError);
+  }  catch (e) {
+    return Response(statusCode: HttpStatus.internalServerError, body: e.toString());
   }
 }

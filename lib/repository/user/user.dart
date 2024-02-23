@@ -41,32 +41,38 @@ class User extends Equatable {
   @override
   List<Object?> get props => [id, username, email, password];
 }
+class Auth{
+  final User? user;
+  final bool exists;
+  final bool isAuth;
 
+  Auth(this.user, this.exists, {this.isAuth = false});
+}
 class UserRepository {
   final DatasourceRepo datasourceRepo;
 
   final Map<String, User> users = {};
 
   //check if user exists in the database
-  Future<User?> userFromCredentials(String email, String password) async {
+  Future<Auth> userFromCredentials(String email, String password) async {
     final hashedPassword = password.hashWithSHA256();
 
     try {
       final userExist = await datasourceRepo.usersRepo.userExists(email.hashWithSHA256());
 
       if (!userExist) {
-        return null;
+        return Auth(null, false);
       }
 
       final user = await datasourceRepo.usersRepo.getItem(email.hashWithSHA256()).then((value) => User.fromJson(value));
 
       final credentialsMatch = user.password == hashedPassword;
 
-      return credentialsMatch ? user : throw Exception('Incorrect credentials');
+      return credentialsMatch ? Auth(user, true, isAuth: true) : Auth(null, true, isAuth: false);
       
     } catch (e) {
 
-      throw Future.error(Exception(e.toString()));
+      throw Future.error(e.toString());
       
     }
   }

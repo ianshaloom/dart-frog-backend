@@ -35,8 +35,9 @@ Future<Response> _getTransaction(
         await repo.getTransaction(transactionId, collection);
 
     return Response.json(body: transaction);
-  } on Exception catch (_) {
-    return Response(statusCode: HttpStatus.internalServerError);
+  } catch (e) {
+    return Response(
+        statusCode: HttpStatus.internalServerError, body: e.toString());
   }
 }
 
@@ -53,8 +54,9 @@ Future<Response> _updateTransaction(
 
     return Response(statusCode: HttpStatus.noContent, body: '$collection updated');
 
-  } on Exception catch (_) {
-    return Response(statusCode: HttpStatus.internalServerError);
+  } catch (e) {
+    return Response(
+        statusCode: HttpStatus.internalServerError, body: e.toString());
   }
 }
 
@@ -69,7 +71,8 @@ Future<Response> _deleteTransaction(
     await repo.deleteTransaction(transactionId, collection);
 
     return Response(statusCode: HttpStatus.noContent, body: '$collection deleted');
-  } on Exception catch (_) {
-    return Response(statusCode: HttpStatus.internalServerError);
+   } catch (e) {
+    return Response(
+        statusCode: HttpStatus.internalServerError, body: e.toString());
   }
 }

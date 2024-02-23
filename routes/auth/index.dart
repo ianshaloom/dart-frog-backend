@@ -6,11 +6,23 @@ import 'package:dart_frog_backend/repository/session/session.dart';
 import 'package:dart_frog_backend/repository/user/user.dart';
 
 FutureOr<Response> onRequest(RequestContext context) async {
-  return switch (context.request.method) {
+  switch (context.request.method) {
+    case HttpMethod.get:
+      return _authenticateUser(context);
+    case HttpMethod.post:
+      return _createUser(context);
+    case HttpMethod.delete:
+    case HttpMethod.put:
+    case HttpMethod.patch:
+    case HttpMethod.head:
+    case HttpMethod.options:
+      return Future.value(Response(statusCode: HttpStatus.methodNotAllowed));
+  }
+/*   return switch (context.request.method) {
     HttpMethod.post => await _createUser(context),
     HttpMethod.get => await _authenticateUser(context),
     _ => Response(statusCode: HttpStatus.methodNotAllowed)
-  };
+  }; */
 }
 
 Future<Response> _createUser(RequestContext context) async {
@@ -28,8 +40,8 @@ Future<Response> _createUser(RequestContext context) async {
 
     final user = await userRepo.createUser(username, email, password);
     return Response(body: user);
-  } on Exception catch (_) {
-    return Response(statusCode: HttpStatus.internalServerError);
+  } catch (e) {
+    return Response(statusCode: HttpStatus.internalServerError, body: 'Error: $e');
   }
 }
 
@@ -49,11 +61,15 @@ Future<Response> _authenticateUser(RequestContext context) async {
 
     final user = await userRepo.userFromCredentials(email, password);
 
-    if (user == null) {
+    if (!user.exists) {
       return Response(statusCode: HttpStatus.unauthorized, body: 'Account with $email not found.');
     }
 
-    final session = await sessionRepo.createSession(user.id);
+    if (!user.isAuth) {
+      return Response(statusCode: HttpStatus.unauthorized, body: 'Invalid password.');
+    }
+
+    final session = await sessionRepo.createSession(user.user!.id);
 
     return Response(body: session.token);
     

@@ -29,8 +29,9 @@ Future<Response> _getProduct(RequestContext context, String productId) async {
   try {
     final product = await repo.getItem(productId);
     return Response.json(body: product);
-  } on Exception catch (e) {
-    return Response(statusCode: HttpStatus.internalServerError, body: e.toString());
+  } catch (e) {
+    return Response(
+        statusCode: HttpStatus.internalServerError, body: e.toString());
   }
 }
 
@@ -41,8 +42,9 @@ Future<Response> _updateProduct(RequestContext context, String productId) async 
   try {
     await repo.updateItem(productId, body);
     return Response(body: 'Product updated');
-  } on Exception catch (e) {
-    return Response(statusCode: HttpStatus.internalServerError, body: e.toString());
+   } catch (e) {
+    return Response(
+        statusCode: HttpStatus.internalServerError, body: e.toString());
   }
 }
 
@@ -52,7 +54,8 @@ Future<Response> _deleteProduct(RequestContext context, String productId) async 
   try {
     await repo.deleteItem(productId);
     return Response(body: 'Product deleted');
-  } on Exception catch (e) {
-    return Response(statusCode: HttpStatus.internalServerError, body: e.toString());
+  } catch (e) {
+    return Response(
+        statusCode: HttpStatus.internalServerError, body: e.toString());
   }
 }

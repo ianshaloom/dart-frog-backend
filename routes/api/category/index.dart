@@ -37,8 +37,8 @@ Future<Response> _getAll(RequestContext context) async {
     final products = await repo.allItems();
     cacheDep.set(categoriesCollection, products, 60);
     return Response.json(body: products);
-  } on Exception catch (_) {
-    return Response(statusCode: HttpStatus.internalServerError);
+  } catch (e) {
+    return Response(statusCode: HttpStatus.internalServerError, body: e.toString());
   }
 }
 
@@ -49,8 +49,9 @@ Future<Response> _postItem(RequestContext context) async {
   try {
     final id = await repo.addItem(body);
     return Response(body: id);
-  } on Exception catch (_) {
-    return Response(statusCode: HttpStatus.internalServerError);
+   } catch (e) {
+    return Response(
+        statusCode: HttpStatus.internalServerError, body: e.toString());
   }
 }
 
@@ -62,7 +63,8 @@ Future<Response> _deleteAll(RequestContext context) async {
 
     return Response(
         body: 'All products deleted', statusCode: HttpStatus.noContent);
-  } on Exception catch (_) {
-    return Response(statusCode: HttpStatus.internalServerError);
+  } catch (e) {
+    return Response(
+        statusCode: HttpStatus.internalServerError, body: e.toString());
   }
 }
