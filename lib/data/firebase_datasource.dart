@@ -513,10 +513,21 @@ class FireStoreImpl extends DatabaseRepo {
       final token = body['token'] as String?;
       final data = <String, dynamic>{id: token};
 
+      // check if token already exists
+      final tokenExist = await firestore.collection(tokensCollection).document(id).exists;
+
+      // if document exists, update token
+      if (tokenExist) {
+        await firestore.collection(tokensCollection).document(id).update(data);
+        return id;
+      }
+
       final doc = await firestore
           .collection(tokensCollection)
           .document(id)
           .create(data);
+
+      //
       return doc.id;
     } on Exception catch (_) {
       return Future.error(Exception('Error adding token'));
