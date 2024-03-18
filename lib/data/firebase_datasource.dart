@@ -486,4 +486,55 @@ class FireStoreImpl extends DatabaseRepo {
       return Future.error(Exception('Error deleting all expenses'));
     }
   }
+
+  /* --------------------------------[TOKEN]----------------------------------- */
+  
+  @override
+  Future<List<Map<String, dynamic>>> allTokens() async {
+    final listOfTokens = <Map<String, dynamic>>[];
+
+    try {
+      await firestore.collection(tokensCollection).get().then((value) {
+        for (final doc in value) {
+          listOfTokens.add(doc.map);
+        }
+      });
+
+      return listOfTokens;
+    } on Exception catch (_) {
+      return Future.error(Exception('Error fetching tokens'));
+    }
+  }
+
+  @override
+  Future<String> addToken(Map<String, dynamic> data) async {
+    try {
+      final id = data['id'] as String? ?? const Uuid().v4();
+
+      final doc =
+          await firestore.collection(tokensCollection).document(id).create(data);
+      return doc.id;
+    } on Exception catch (_) {
+      return Future.error(Exception('Error adding token'));
+    }
+  }
+
+  @override
+  Future<void> updateToken(String id, Map<String, dynamic> data) async {
+    try {
+      await firestore.collection(tokensCollection).document(id).update(data);
+    } on Exception catch (_) {
+      return Future.error(Exception('Error updating token'));
+    }
+  }
+
+  @override
+  Future<void> deleteToken(String id) async {
+    try {
+      await firestore.collection(tokensCollection).document(id).delete();
+    } on Exception catch (_) {
+      return Future.error(Exception('Error deleting token'));
+    }
+  }
+
 }

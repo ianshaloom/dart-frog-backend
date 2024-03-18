@@ -17,6 +17,8 @@ class DatasourceRepo {
   ExpenseRepoImpl get expenseRepo => ExpenseRepoImpl(databaseRepo);
 
   TransactionRepoImpl get transactionRepo => TransactionRepoImpl(databaseRepo);
+
+  TokensRepoImpl get tokensRepo => TokensRepoImpl(databaseRepo);
 }
 
 class ProductRepoImpl extends ModelRepo {
@@ -249,5 +251,28 @@ class TransactionRepoImpl {
 
   Future<void> deleteAllTransaction(String collection) async {
     await databaseRepo.deleteAllTransactions(collection);
+  }
+}
+
+class TokensRepoImpl {
+  TokensRepoImpl(this.databaseRepo);
+
+  final DatabaseRepo databaseRepo;
+
+  Future<String> addToken(Map<String, dynamic> data) async {
+    final id = await databaseRepo.addToken(data);
+    return id;
+  }
+
+  Future<List<Map<String, dynamic>>> allTokens() async {
+    final tokens = await databaseRepo.allTokens();
+    return tokens;
+  }
+
+  Future<void> updateToken(String id, Map<String, dynamic> data) async {
+    await databaseRepo.updateToken(id, data);
+  }
+  Future<void> deleteToken(String id) async {
+    await databaseRepo.deleteToken(id);
   }
 }

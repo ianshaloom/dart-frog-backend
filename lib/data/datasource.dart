@@ -50,4 +50,11 @@ abstract class DatabaseRepo {
   Future<void> updateExpense(String id, Map<String, dynamic> data);
   Future<void> deleteExpense(String id);
   Future<void> deleteAllExpenses();
+
+
+  /// token CRUD operations
+  Future<List<Map<String, dynamic>>> allTokens();
+  Future<String> addToken(Map<String, dynamic> data);
+  Future<void> updateToken(String id, Map<String, dynamic> data);
+  Future<void> deleteToken(String id);
 }

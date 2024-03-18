@@ -24,6 +24,9 @@ const String purchasesCollection = 'purchases';
 /// A collection of expenses.
 const String expensesCollection = 'expenses';
 
+/// A collection of tokens.
+const String tokensCollection = 'tokens';
+
 extension StringExtension on String {
   String hashWithSHA256() {
     var bytes = utf8.encode(this);
