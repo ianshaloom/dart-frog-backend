@@ -488,7 +488,7 @@ class FireStoreImpl extends DatabaseRepo {
   }
 
   /* --------------------------------[TOKEN]----------------------------------- */
-  
+
   @override
   Future<List<Map<String, dynamic>>> allTokens() async {
     final listOfTokens = <Map<String, dynamic>>[];
@@ -507,12 +507,16 @@ class FireStoreImpl extends DatabaseRepo {
   }
 
   @override
-  Future<String> addToken(Map<String, dynamic> data) async {
+  Future<String> addToken(Map<String, dynamic> body) async {
     try {
-      final id = data['id'] as String? ?? const Uuid().v4();
+      final id = body['id'] as String? ?? const Uuid().v4();
+      final token = body['token'] as String?;
+      final data = <String, dynamic>{id: token};
 
-      final doc =
-          await firestore.collection(tokensCollection).document(id).create(data);
+      final doc = await firestore
+          .collection(tokensCollection)
+          .document(id)
+          .create(data);
       return doc.id;
     } on Exception catch (_) {
       return Future.error(Exception('Error adding token'));
@@ -536,5 +540,4 @@ class FireStoreImpl extends DatabaseRepo {
       return Future.error(Exception('Error deleting token'));
     }
   }
-
 }
